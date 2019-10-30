@@ -314,20 +314,20 @@ from scipy.stats import norm   # Gives access to functionality about normal dist
 #       If you're unsure how to use that function, google it.
 # Hint: A 30% loss translates to a gross return of 0.7, which needs still to be translated into a log return.
 #
-prob_1y_spx = norm.cdf(returns_stats_annual.loc['SPX','mean']*0.7,returns_stats_annual.loc['SPX','mean'],returns_stats_annual.loc['SPX','std']) 
+prob_1y_spx = norm.cdf(np.log(0.7), returns_stats_annual.loc['SPX','mean'],returns_stats_annual.loc['SPX','std']) 
 prob_1y_spx
 
 # What is the probability of a 30% loss after 10 years of holding the SPX?
-prob_10y_spx = norm.cdf(returns_stats_annual.loc['SPX','mean']*0.7*10,returns_stats_annual.loc['SPX','mean']*10,returns_stats_annual.loc['SPX','std']*np.sqrt(10))
+prob_10y_spx = norm.cdf(np.log(0.7), returns_stats_annual.loc['SPX','mean']*10,returns_stats_annual.loc['SPX','std']*np.sqrt(10))
 prob_10y_spx
 
 # What is the probability of a 30% loss after 1 year of holding the VBTIX?
 #
-prob_1y_vbtix = norm.cdf(returns_stats_annual.loc['VBTIX','mean']*0.7,returns_stats_annual.loc['VBTIX','mean'],returns_stats_annual.loc['VBTIX','std']) 
+prob_1y_vbtix = norm.cdf(np.log(0.7), returns_stats_annual.loc['VBTIX','mean'],returns_stats_annual.loc['VBTIX','std']) 
 prob_1y_vbtix
 
 # What is the probability of a 30% loss after 10 years of holding the VBTIX?
-prob_10y_vbtix = norm.cdf(returns_stats_annual.loc['VBTIX','mean']*0.7*10,returns_stats_annual.loc['VBTIX','mean']*10,returns_stats_annual.loc['VBTIX','std']*np.sqrt(10))
+prob_10y_vbtix = norm.cdf(np.log(0.7), returns_stats_annual.loc['VBTIX','mean']*10,returns_stats_annual.loc['VBTIX','std']*np.sqrt(10))
 prob_10y_vbtix
 
 # Q: What do you think about the equity investment now? Would you prefer the bond investment?
