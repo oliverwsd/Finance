@@ -1,4 +1,4 @@
-### empirical finance
+### Empirical Finance
 Upload 30.10.2019:
 The purpose of this project is setting a backup for the python coding course.
 Current relevant packages: numpy pandas matplotlib.pyplot scipy.stats 
