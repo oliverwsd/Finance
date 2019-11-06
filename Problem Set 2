@@ -75,8 +75,8 @@ mu
 #       you would expect it to work but it doesn't)
 #
 volatility_matrix = np.diag(std_annual)                  # This is the diagonal matrix of the volatilities
-correlation_matrix = 
-Cov =
+correlation_matrix = np.corrcoef(avg_ret_annual)
+Cov = np.dot(volatility_matrix, correlation_matrix, volatility_matrix)
 Cov   # Hint: Cov.shape should be (5, 5)
 
 
