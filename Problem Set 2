@@ -1,0 +1,280 @@
+
+#
+# ================================================
+# Python for Empirical Finance WS 19/20
+# Problem Set 2, Week 3
+# Portfolio Allocation
+# ================================================
+#
+# Prepared by Elmar Jakobs & Simon Walther
+#
+
+# In this problem set, you will build your first Markowitz portfolios. You will identify
+# the minimum variance portfolio, the tangency portfolio and the complete efficient
+# frontier.
+#
+# Enjoy!
+
+
+# Setup
+# -----
+#
+# Import packages for econometric analysis
+#
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# IMPORTANT !!!
+#
+# For submission, please change the status to 'SOLN', leave it empty while you are working on it.
+# Once you set the status to 'SOLN', the code will not work on your machine any more. Don't worry,
+# if it worked before setting status = 'SOLN', you're fine.
+# If you hand in a file, with status not equal to 'SOLN', it will not count as a regular submission,
+# which may lead to an evaluation with 0 points.
+#
+status = ''
+#status = 'SOLN'  # You can also just comment in this line
+
+
+# Preparation
+# Load and prepare data
+#
+prices = pd.read_csv('price_data.csv', parse_dates = ['Date'])  # Stock prices
+
+returns = prices.copy()
+returns.loc[:, ['VBTIX', 'GE', 'WMT', 'IBM', 'SPX']] = np.log(returns.loc[:, ['VBTIX', 'GE', 'WMT', 'IBM', 'SPX']]) - np.log(returns.loc[:, ['VBTIX', 'GE', 'WMT', 'IBM', 'SPX']].shift())
+
+avg_ret_annual = returns.loc[:, ['VBTIX', 'GE', 'WMT', 'IBM', 'SPX']].mean(axis = 0) * 252
+std_annual = returns.loc[:, ['VBTIX', 'GE', 'WMT', 'IBM', 'SPX']].std(axis = 0, ddof = 0) * (252**0.5)
+
+
+
+# Task 1: Investment Opportunity Set
+# ---------------------------------------
+
+# Define the expected returns and bring them into the correct format for further calculations.
+# To ease further computation steps, we use numpy matrices (np.matrix).
+#
+# First, create a 5x1 np.matrix with the annual expected returns for each asset. The order of the assets
+# in the matrix should be (from top to down) 'VBTIX', 'GE', 'WMT', 'IBM', 'SPX'.
+#
+mu =
+mu.shape   # Hint: The shape should be (5, 1)
+mu
+
+# Define the covariance matrix
+# You can calculate the covariance matrix as diag(Volatility_Vector) * Correlation_Matrix * diag(Volatility_Vector)
+# Here, diag(Volatility_Matrix) is a 5x5 diagonal matrix with annual expected volatilities of the assets on the diagonal.
+# The Correlation_Matrix is an estimate for the Pearson Correlation Matrix of the returns.
+# Again, use numpy matrices.
+#
+# Hint: Use np.diag(...) function to create a diagonal matrix from a vector of elements that the diagonal contains.
+#       Use np.dot(...) to perform a matrix notation.
+#       Do NOT use the '*' character for the multiplication (usually, that works, too, but there are cases where
+#       you would expect it to work but it doesn't)
+#
+volatility_matrix =                   # This is the diagonal matrix of the volatilities
+correlation_matrix =
+Cov =
+Cov   # Hint: Cov.shape should be (5, 5)
+
+
+# Check of intermediate result (1):
+#
+# HINT: Check for yourself: mu[1, 0] should be -0.083  (rounded to 3 digits)
+#       Check for yourself: Cov[3, 1] should be 0.036  (rounded to 3 digits)
+if status == 'SOLN':
+    Test.assertEquals(str(np.round(mu[2, 0],3))[0:5], str(checker_results.loc[1, 'result']), 'Check 1 failed')
+    Test.assertEquals(str(np.round(Cov[1, 2],3))[0:5], str(checker_results.loc[2, 'result']), 'Check 2 failed')
+
+
+# Task 2: Minimum Variance Portfolio
+# ---------------------------------------
+
+# Calculate the weights of the global minimum variance portfolio
+# Mathematically, the solution for these weights is
+#     w_mvp = (Cov^{-1} * e) / (transpose(e) * Cov^{-1} * e)
+# where e is a (5, 1) vector of ones.
+#
+# Hint: To get the inverse (transpose) of a matrix use the '.getI()' ('.getT()') functions
+#
+e =
+w_mvp     =
+
+# Hint: Check for yourself: Do the weights of the minimum variance portfolio add up to 1?
+
+# Calculate the expected mean of the minimum variance portfolio
+# The expected mean of a portfolio with weight w is transpose(w) * mu
+#
+mu_mvp    =                             # Make sure this is a scalar (i.e. a single number, not a 1x1 matrix)
+mu_mvp
+
+# Calculate the expected volatility of the minimum variance portfolio
+# The expected volatility of a portfolio with weight w is (transpose(w) * Cov * w)^0.5
+#
+sigma_mvp =                              # Make sure this is a scalar (i.e. a single number, not a 1x1 matrix)
+sigma_mvp
+
+
+# Check of intermediate result (2):
+#
+# HINT: Check for yourself: w_mvp[0, 0] should be 0.909 (rounded to 3 digits)
+if status == 'SOLN':
+    Test.assertEquals(str(np.round(sigma_mvp, 2))[0:4], str(checker_results.loc[3, 'result']), 'Check 3 failed')
+
+
+# Task 3: Efficient Frontier
+# -------------------------------
+
+# Calculate the unconstrained efficient frontier (analytical solution)
+# Here's the formula for the weights of a portfolio on the efficient frontier for a given return mu_i
+# Notation: mu = Asset returns, Cov = Covariance matrix, e = Vector of ones, w = Portfolio weights
+#
+# X = transpose(mu) * Cov^{-1} * mu
+# Y = transpose(mu) * Cov^{-1} * e
+# Z = tranpose(e) * Cov^{-1} * e
+# D = X * Z - Y * Y
+# g = (X * Cov^{-1} * e - Y * Cov^{-1} * mu) / D
+# h = (Z * Cov^{-1} * mu - Y * Cov^{-1} * e) / D
+# w = g + h * mu_i
+#
+# Hint: Sometimes it is helpful to convert a (1,1) matrix into a scalar,
+#       therefore use '.item()' or [0, 0]
+#
+X  =
+Y  =
+Z  =
+D  =
+g =
+h  =
+
+
+# Set the number of efficient portfolios that we will calculate
+n = 400
+
+
+# Define the minimum and maximum return of your efficient frontier
+#
+mu_min = 0
+mu_max = 0.2
+incr   = (mu_max - mu_min) / (n-1)  # This is the increment of target portfolio returns
+
+
+# Calculate the efficient portfolios along the frontier by incrementing the return
+#
+w_ef     = np.zeros( (n, mu.shape[0]) )  # Will hold the portfolio weights
+sigma_ef = np.zeros( (n, 1) )            # Will hold the portfolio volatilities
+mu_ef    = np.zeros( (n, 1) )            # Will hold the portfolio returns
+
+for i in range (n):
+    mu_i        =
+    w_i         =
+    w_ef[i,:]   =
+    mu_ef[i]    =
+    sigma_ef[i] =
+
+# Check of intermediate result (3):
+#
+# HINT: Check for yourself: w_ef[0, 1] should be 0.084 (rounded to 3 digits)
+#       Check for yourself: mu_ef[16, 0] should be 0.008 (rounded to 3 digits)
+#       Check for yourself: sigma_ef[50, 0] should be 0.048 (rounded to 3 digits)
+if status == 'SOLN':
+    Test.assertEquals(str(np.round(w_ef[64, 4], 3))[0:5], str(checker_results.loc[4, 'result']), 'Check 4 failed')
+    Test.assertEquals(str(np.round(mu_ef[30, 0], 3))[0:5], str(checker_results.loc[5, 'result']), 'Check 5 failed')
+    Test.assertEquals(str(np.round(sigma_ef[30, 0], 3))[0:5], str(checker_results.loc[6, 'result']), 'Check 6 failed')
+
+
+# Task 4: Tangency PF
+# ------------------------
+
+
+# Find the tangency portfolio among the ones in the efficient frontier
+#
+# HINT: The tangency portfolio is the portfolio with the highest Sharpe ratio
+#
+riskfree = 0.0   # We just assume the riskfree rate is 0% here
+
+w_tp     =                # We expect the w_tp.shape = (5,), i.e. an 1-dimensional vector
+mu_tp    =                # We expect a scalar here (not a 1x1 matrix)
+sigma_tp =                # We expect a scalar here (not a 1x1 matrix)
+
+
+# Check of intermediate result (4):
+#
+# HINT: Check for yourself: sharpe[10] should be 0.121 (rounded to 3 digits)
+#       Check for yourself: ind should be 130
+if status == 'SOLN':
+    Test.assertEquals(str(np.round(w_tp[0], 3))[0:5], str(checker_results.loc[7, 'result']), 'Check 7 failed')
+    Test.assertEquals(str(np.round(mu_tp, 3))[0:5], str(checker_results.loc[8, 'result']), 'Check 8 failed')
+    Test.assertEquals(str(np.round(sigma_tp, 3))[0:5], str(checker_results.loc[9, 'result']), 'Check 9 failed')
+
+
+
+
+# Visualization - not graded
+# --------------------------
+
+
+# Print interesting statistics like weights, exp. returns and variance of the minimum variance and tangency portfolio
+#
+print()
+print('Unconstrained Markowitz Optimization')
+print('====================================')
+print()
+print('Minimum Variance Portfolio')
+print('--------------------------')
+print('Weights:         ', np.round(w_mvp.getT(), 2))
+print('Exp. Return:     ', np.round(mu_mvp, 2))
+print('Exp. Volatility: ', np.round(sigma_mvp, 2))
+print()
+print('Tangency Portfolio')
+print('------------------')
+print('Weights          : ', np.round(w_tp, 2))
+print('Exp. Return      : ', np.round(mu_tp, 2))
+print('Exp. Volatility  : ', np.round(sigma_tp, 2))
+print('Exp. Sharpe Ratio: ', np.round( (mu_tp - riskfree)/sigma_tp, 2 ) )
+print()
+
+
+# Plot the portfolios defining the efficient frontier
+#
+plt.figure(3, figsize = (12, 7))
+
+# Add a horizontal line at the 0 return
+plt.axhline(y = 0, linestyle = '--', color = 'gray')
+
+# Add the efficient frontier
+plt.plot(sigma_ef, mu_ef, color = 'blue', label = 'Efficient Frontier')
+
+# Add the capital market line
+sharpe_tp = ( (mu_tp - riskfree) / sigma_tp )
+cx = np.linspace(0.0, np.max(sigma_ef))
+plt.plot(cx, riskfree + sharpe_tp * cx, color = 'black', label = 'Capital Market Line')
+
+# Add the risk free rate
+plt.scatter([0], [riskfree], s = 15, color = 'black', label = 'Riskfree investment')
+
+# Add the tangency portfolio
+plt.scatter([sigma_tp], [mu_tp], s = 15, color = 'green', label = 'Tangency portfolio')
+
+# Add the mvp portfolio
+plt.scatter([sigma_mvp], [mu_mvp], s = 15, color = 'red', label = 'Minimum variance portfolio')
+
+# Add the single assets
+plt.scatter(std_annual.values, avg_ret_annual.values, s = 15, color = 'gray', label = 'Individual assets')
+
+# Describe the axis
+plt.xlabel('Exp. Volatility of PF')
+plt.ylabel('Exp. Return of PF')
+
+# Set x axis boundaries
+plt.xlim((0, 0.35))
+
+# Add a title
+plt.title('Markowitz Portfolio Allocation (unconstrained)', fontweight = 'bold')
+
+# Add a legend
+plt.legend()
+
+plt.show()
