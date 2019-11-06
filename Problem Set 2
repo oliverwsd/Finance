@@ -75,8 +75,9 @@ mu
 #       you would expect it to work but it doesn't)
 #
 volatility_matrix = np.diag(std_annual)                  # This is the diagonal matrix of the volatilities
-correlation_matrix = np.corrcoef(avg_ret_annual)
-Cov = np.dot(volatility_matrix, correlation_matrix, volatility_matrix)
+#correlation_matrix = np.corrcoef(avg_ret_annual)
+#Cov = np.dot(volatility_matrix, correlation_matrix, volatility_matrix)
+Cov = returns.loc[:, ['VBTIX', 'GE', 'WMT', 'IBM', 'SPX']].corr()
 Cov   # Hint: Cov.shape should be (5, 5)
 
 
@@ -99,7 +100,8 @@ if status == 'SOLN':
 #
 # Hint: To get the inverse (transpose) of a matrix use the '.getI()' ('.getT()') functions
 #
-e =
+e = np.mat(np.ones([5,1]))
+transpose_e = e.getI()
 w_mvp     =
 
 # Hint: Check for yourself: Do the weights of the minimum variance portfolio add up to 1?
