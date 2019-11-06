@@ -59,7 +59,7 @@ std_annual = returns.loc[:, ['VBTIX', 'GE', 'WMT', 'IBM', 'SPX']].std(axis = 0, 
 # First, create a 5x1 np.matrix with the annual expected returns for each asset. The order of the assets
 # in the matrix should be (from top to down) 'VBTIX', 'GE', 'WMT', 'IBM', 'SPX'.
 #
-mu =
+mu = np.matrix(avg_ret_annual).T
 mu.shape   # Hint: The shape should be (5, 1)
 mu
 
@@ -74,8 +74,8 @@ mu
 #       Do NOT use the '*' character for the multiplication (usually, that works, too, but there are cases where
 #       you would expect it to work but it doesn't)
 #
-volatility_matrix =                   # This is the diagonal matrix of the volatilities
-correlation_matrix =
+volatility_matrix = np.diag(std_annual)                  # This is the diagonal matrix of the volatilities
+correlation_matrix = 
 Cov =
 Cov   # Hint: Cov.shape should be (5, 5)
 
