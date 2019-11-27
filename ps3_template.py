@@ -217,8 +217,7 @@ for i in range(len(pf_16)):
   r_t = pf.iloc[i,0:16]- factors.iloc[i,2]
   result = sm.OLS(r_t, betas).fit()
   gammas.iloc[i,1] = result.params[0]
-
-gammas.loc[167,'gamma']...
+#gammas.loc[167,'gamma']
 
 # Calculate the average gamma
 # Note: exp_ret_11 and exp_ret_44 should be scalars (not pandas or numpy DataFrames/arrays/etc of size 1x1 or similar)
