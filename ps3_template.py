@@ -35,7 +35,7 @@ import matplotlib.pyplot as plt
 # If you hand in a file, with status not equal to 'SOLN', it will not count as a regular submission,
 # which may lead to an evaluation with 0 points.
 #
-status = ''
+status = 'SOLN'
 #status = 'SOLN'  # You can also just comment in this line
 
 
@@ -58,8 +58,8 @@ status = ''
 # Convert the 'date' column to the datetime data type by using the 'to_datetime' function of the pandas package.
 # Note: The date column indicates the date and the month to which the returns of the row correspond.
 #
-pf_16 =
-pf_16['date'] =
+pf_16 = pd.read_csv('16pf_bm_beta.csv')
+pf_16['date'] = pd.to_datetime(pf_16['date'],format='%Y%m')
 pf_16.head()
 
 # Read-in the factors for German market from the provided file 'monthly_factors.csv' (rf is risk free rate):
@@ -69,8 +69,8 @@ pf_16.head()
 #   4. WML (Carhart momentum factor)
 # Like above, convert the 'date' column to the datetime data type.
 #
-factors =
-
+factors = pd.read_csv('monthly_factors.csv')
+factors['date'] = pd.to_datetime(factors['date'],format='%Y%m')
 factors.head()
 
 # Check of intermediate result (1):
@@ -88,48 +88,48 @@ if status == 'SOLN':
 
 # Estimate the Capital Asset Pricing Model for the '11' and '44' portfolios
 #
-
 # First, calculate excess returns and add a constant column (called 'const'), that is fully filled with 1.
 # Note: X should be a DataFrame. X.columns should be ['const', 'rm_excess']. Make sure the order is correct!
 #       This is very important!
 #
-X  =
-
+X = pd.DataFrame()
+X['const'] = np.ones(len(factors['rm']))
+X['rm_excess'] = factors['rm'] - factors['rf']
 X.columns
 X.head()
 
 # Calculate excess returns for the '11' portfolio.
 # Note: Y should be a DataFrame. Y.columns should be ['11_excess']
 #
-Y =
+Y = pd.DataFrame()
+Y['11_excess'] = pf_16['11'] - factors['rf']
 Y.head()
-
-
 
 # Set up the OLS model object for the '11' portfolio following the CAPM model:
 # r_{11} - r_f = \alpha + \beta * (r_M - r_f) + error_{11}
 # Use the OLS class of the statsmodels package, which can be accessed via sm.OLS
 #
-model_11 =
+model_11 = sm.OLS(Y,X)
 
 # Run the OLS parameter estimation by calling the 'fit' function of the OLS object.
 #
-results_11 =
+results_11 = model_11.fit()
 
 # Print the details for the model fit by calling the 'summary' function of the OLS
 # result object.
 #
-...
+print(results_11.summary())
 
 
 # Redo exercise above for portfolio '44'
 #
-Y =
+Y = pd.DataFrame()
+Y['44_excess'] = pf_16['44'] - factors['rf']
 Y.head()
 
-model_44   =
-results_44 =
-...
+model_44 = sm.OLS(Y,X)
+results_44 = model_44.fit()
+print(results_44.summary())
 
 # Forecasting using the CAPM
 #   We assume an expected market risk premium of 6%
@@ -147,8 +147,8 @@ EXP_MARKET_EXCESS_RETURN = 6
 # Note: exp_ret_11 and exp_ret_44 should be scalars (not pandas or numpy DataFrames/arrays/etc of size 1x1 or similar)
 #
 RISKFREE = 2
-exp_ret_11 =
-exp_ret_44 =
+exp_ret_11 = results_11.params[1]* EXP_MARKET_EXCESS_RETURN + RISKFREE
+exp_ret_44 = results_44.params[1]* EXP_MARKET_EXCESS_RETURN + RISKFREE
 
 # Check of intermediate result (2):
 #
@@ -184,8 +184,12 @@ plt.show()
 portfolios = ['11', '12', '13', '14', '21', '22', '23', '24', '31', '32', '33', '34', '41', '42', '43', '44']
 betas = pd.DataFrame(index = portfolios, columns = ['beta'], dtype = np.float64)
 
-for ...
-
+for x in portfolios: 
+  Y = pd.DataFrame()
+  Y['excess'] = pf_16[x] - factors['rf']
+  model_pf = sm.OLS(Y,X).fit()
+  betas.loc[x,'beta'] = model_pf.params[1]
+betas
 # Now we enter the second stage of the estimation of the securities market line. Recall the
 # equation for the securities market line:
 #                  r_i - r_f = \gamma * \beta_i + error_i
@@ -205,12 +209,21 @@ for ...
 gammas = pd.DataFrame(columns = ['date', 'gamma'])
 gammas['date'] = pf_16['date'].copy()
 
-...
+beta_t = pd.DataFrame()
+
+pf = pf_16.drop(columns='date')
+for i in range(len(pf_16)):
+  r_t = pd.DataFrame()
+  r_t = pf.iloc[i,0:16]- factors.iloc[i,2]
+  result = sm.OLS(r_t, betas).fit()
+  gammas.iloc[i,1] = result.params[0]
+
+gammas.loc[167,'gamma']...
 
 # Calculate the average gamma
 # Note: exp_ret_11 and exp_ret_44 should be scalars (not pandas or numpy DataFrames/arrays/etc of size 1x1 or similar)
 #
-avg_gamma =
+avg_gamma = gammas['gamma'].mean()
 
 # Check of intermediate result (3):
 #
@@ -251,16 +264,18 @@ plt.show()
 # with 1.
 # Note: X should be a DataFrame. X.columns should be ['rm_excess', 'const']
 #
-X =
+X = pd.DataFrame()
+X['rm_excess'] = factors['rm'] - factors['rf']
+X['const'] = np.ones(len(factors['rm']))
 X.head()
-
 
 # Now, add the two other factors to X (columns 'SMB' and 'HML' in X and factors). You do not need to subtract the
 # riskfree rate from these factors. Make sure the order of the columns in X is
 # X.columns = ['const', 'rm_excess', 'SMB', 'HML']
 # Q: Why do we not need to subtract the riskfree rate?
 #
-...
+X['SMB'] = factors['SMB']
+X['HML'] = factors['HML']
 X.head()
 
 
@@ -268,26 +283,28 @@ X.head()
 # on what happened in between, maybe Y is something different now. Recalculate it here.
 # Note: Y should be a DataFrame. Y.columns should be ['11_excess']
 #
-Y =
+Y = pd.DataFrame()
+Y['11_excess'] = pf_16['11'] - factors['rf']
 Y.head()
 
 
 # Now, estimate the FF3 model. Again, use OLS with the additional 'SMB' and 'HML' columns now.
 #
-model_11   =
-results_11 =
+model_11   = sm.OLS(Y,X)
+results_11 = model_11.fit()
 
 # Inspect the OLS estimates by calling the 'summary' function of the OLS result object.
 #
-...
+print(results_11.summary())
 
 # Repeat the exercise above for the '44' portfolio and inspect the Fama-French OLS estimates
 # of the '44' portfolio.
 #
-Y =
-model_44   =
-results_44 =
-...
+Y = pd.DataFrame()
+Y['44_excess'] = pf_16['44'] - factors['rf']
+model_44   = sm.OLS(Y, X)
+results_44 = model_44.fit()
+print(results_44.summary())
 
 # Check of intermediate result (4):
 #
