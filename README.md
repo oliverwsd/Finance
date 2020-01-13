@@ -11,5 +11,7 @@ Build first Markowitz portfolios, identify the minimum variance portfolio, the t
 Estimate the CAPM and make predictions for the expected return of a stock based on the CAPM and the regarding Security Market Line.
 Generalize to a multi-factor model and explain portfolio returns with the 3 Fama-French factors.
 ### Problem Set 4:
-Estimate an ARMA(1, 1) model to predict factor returns, then create return forecasts and simulate the model to obtain the model-implied
-distribution of factor returns.
+Estimate an ARMA(1, 1) model to predict factor returns, then create return forecasts and simulate the model to obtain the model-implied distribution of factor returns.
+### Problem Set 5:
+Estimate an AR(1)-GARCH(1,1) model to predict factor returns and their volatility. Compare the volatility forecast
+of the GARCH model with the vol forecast of a simpler ARCH(1) model.
